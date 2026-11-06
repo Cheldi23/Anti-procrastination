@@ -3,7 +3,7 @@ import socket, struct, ssl, threading, subprocess, signal, sys
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
 CIBLE    = "https://www.coursera.org/"
-UPSTREAM = ("127.0.0.1", 53)
+UPSTREAM = ("1.1.1.1", 53)
 CERT, KEY = "/etc/antiproc/cert.pem", "/etc/antiproc/key.pem"
 
 # ---------- DNS ----------
