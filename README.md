@@ -34,8 +34,8 @@ Un certificat local de confiance (créé avec [mkcert](https://github.com/FiloSo
 ### Installation
 
 ```bash
-git clone https://github.com/TON-PSEUDO/antiproc.git
-cd antiproc
+git clone https://github.com/Cheldi23/Anti-procrasination.git
+cd Anti-procrasination
 chmod +x install.sh
 ./install.sh
 ```
@@ -136,8 +136,8 @@ A locally trusted certificate (created with [mkcert](https://github.com/FiloSott
 ### Installation
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/antiproc.git
-cd antiproc
+git clone https://github.com/Cheldi23/Anti-procrasination.git
+cd Anti-procrasination
 chmod +x install.sh
 ./install.sh
 ```
