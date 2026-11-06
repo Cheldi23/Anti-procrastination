@@ -1,10 +1,30 @@
 #!/usr/bin/env python3
+"""antiproc : serveur DNS local + redirection HTTPS (voir README.md)."""
 import socket, struct, ssl, threading, subprocess, signal, sys
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
-CIBLE    = "https://www.coursera.org/"
-UPSTREAM = ("1.1.1.1", 53)
-CERT, KEY = "/etc/antiproc/cert.pem", "/etc/antiproc/key.pem"
+CONFIG       = "/etc/antiproc/config"          # contient une ligne : CIBLE=<adresse>
+CIBLE_DEFAUT = "https://www.coursera.org/"     # utilisée si le fichier est absent ou invalide
+UPSTREAM     = ("1.1.1.1", 53)
+CERT, KEY    = "/etc/antiproc/cert.pem", "/etc/antiproc/key.pem"
+
+
+# ---------- Configuration ----------
+def lire_cible():
+    """Lit la destination dans CONFIG. Relue à chaque requête : un changement
+    (./install.sh --set-target) est pris en compte sans redémarrer le service."""
+    try:
+        with open(CONFIG, encoding="utf-8") as f:
+            for ligne in f:
+                if ligne.startswith("CIBLE="):
+                    cible = ligne[len("CIBLE="):].strip()
+                    if (cible.startswith(("http://", "https://"))
+                            and not any(c in cible for c in "\r\n\t ")):
+                        return cible
+    except OSError:
+        pass
+    return CIBLE_DEFAUT
+
 
 # ---------- DNS ----------
 def lire_question(data):
@@ -51,10 +71,13 @@ def serveur_dns():
         data, addr = sock.recvfrom(4096)
         threading.Thread(target=traiter, args=(data, addr, sock), daemon=True).start()
 
+
 # ---------- Redirection HTTP/HTTPS ----------
 class Redirect(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.send_response(302); self.send_header("Location", CIBLE); self.end_headers()
+        self.send_response(302)
+        self.send_header("Location", lire_cible())
+        self.end_headers()
     do_HEAD = do_POST = do_GET
     def log_message(self, *a): pass
 
@@ -65,6 +88,7 @@ def serveur_web(port, tls):
         ctx.load_cert_chain(CERT, KEY)
         srv.socket = ctx.wrap_socket(srv.socket, server_side=True)
     srv.serve_forever()
+
 
 # ---------- Configuration système ----------
 def interface():
