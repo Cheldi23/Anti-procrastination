@@ -1,0 +1,10 @@
+[Unit]
+Description=Anti-procrastination DNS + redirection
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/python3 /usr/local/bin/antiproc.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
